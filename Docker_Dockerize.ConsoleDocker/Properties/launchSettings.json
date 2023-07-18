@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Docker_Dockerize.ConsoleDocker": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

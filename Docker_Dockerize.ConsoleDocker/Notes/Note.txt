@@ -1,0 +1,101 @@
+Docker Commands : docs.docker.com/engine/reference/commandline/cli
+
+
+Image oluþturmak için :
+
+1 - Docker çalýþýyor olmalý
+2 - Dockera login olunmalý
+3 - Linux containers çalýþtýrýyor olmalý
+
+Image oluþturma komutu  :  docker build -t dockerizeconsoleapp .
+-t dockerizeconsoleapp > oluþacak olan image ismi (lowercase olmalýymýþ komut çalýþýnca hata verdi)
+en son Dockerfile yeri : . > komutu çalýþtýrdýðým path içinde
+
+Container oluþturma komutu  :  docker create --name dockerizeconsoleapp_container dockerizeconsoleapp
+ --name dockerizeconsoleapp_container > oluþacak olan container ismi 
+ sondaki : instance alýp container oluþacak olan image ismi
+
+ Container listeleme : docker ps
+ docker ps :  çalýþan containerlarý listele
+ docker ps -a : tüm containerlarý listele
+
+1 - docker build -t dockerizeconsoleapp .  : image oluþtur
+docker build -t dockerizeconsoleapp:v1 .   : : ile TAG (versiyonlama) verilebilir ( biþey verilmediðinde  "latest" oluyor yukarýdaki örnekte)
+2 - docker images : docker üzerindeki tüm imagelarý listele. 
+3 - docker create --name dockerizeconsoleapp_container dockerizeconsoleapp  : container oluþtur
+4 - docker ps -a : containerlarý listele
+5 - docker start dockerizeconsoleapp_container / docker start c89 : ismi verilen containerý çalýþtýr (Id ilk 3 karakter de verilebilir)
+6 - docker stop dockerizeconsoleapp_container : ismi verilen containerý durdur
+7 - docker attach c89 : ilgili containera baðlanmak ( bu durumda console loglarý grebilirim)
+
+8 - docker run --name dockerizeconsoleapp_container2 dockerizeconsoleapp 
+docker run --name dockerizeconsoleapp_container2 dockerizeconsoleapp:v1 (versiyon belirtip o tagli olan imagedan)
+docker run --name dockerizeconsoleapp_container2 646 (IMAGE ID ilk 3 karakter)  ( biþey verilmediðinde  "latest" oluyor)
+docker run : docker create + docker start + container attach :  container oluþtur ve çalýþtýr(ayaða kaldýr)
+
+9 - docker rm 961 : container silme
+docker rm containerId/containerName  : container çalýþýyorsa bu þekilde silinmez
+docker rm containerId/containerName  --force :  container çalýþýyorsa silmek için force sil demeli
+
+10 - docker run --rm --name dockerizeconsoleapp_container3 646
+docker run --rm  : run ile oluþturulup ayaða kaldýrýlan container durdurulduðunda silinsin istenirse --rm parametresi verilir.
+
+Ctrl+C : containerý otomatik stop ediyor, etmezse : docker stop
+
+11 -  docker rmi dockerizeconsoleappsilinecek
+docker rmi : remove image
+docker rmi imageId/imageName : bu image a baðlý herhangi bir container varsa (ÇALIÞSA DA ÇALIÞMASA DA), o image bu þekilde silinmez 
+docker rmi imageId/imageName --force :  bu image a baðlý herhangi bir container ÇALIÞMIYORSA silmek için force sil demeli
+
+---->>> DOCKER PUSH ve DOCKER PULL docker hub ile haberleþirler  : docker cli çnk. Azure cli da Azure ile haberleþir Azure Container Registry'e..
+--> 1 private sayýsýz public repo oluþturabiliriz ücretisz verisyonda.
+
+12 - docker pull mcr.microsoft.com/dotnet/sdk (tag yok latest çekilir : 7.0 þuan :  tagli çekmek mantýklý yoksa öngörülemez)
+docker pull mcr.microsoft.com/dotnet/sdk:7.0 (tagli > .net 7.0)
+docker pull : docker hub tan image çekme 
+
+13 - docker push : docker hub repositorylerine public/private image göndermek için (docker login komutu ile de olunabilir)
+önce docker hubta bir repository oluþturulur. (setting kýsmýndan public -> private yapýlabilir.) > hubta dockerdeneme adýnda repo oluþturdum.(docker push merveugursac/dockerdeneme:tagname) login deðilsek olmalýyýz : 1 repo içine taglerle 1den çok image atabiliyorum
+
+
+
+
+
+
+
+
+
+#########################################################         Dockerfile        ###########################################################################
+
+FROM mcr.microsoft.com/dotnet/runtime:7.0 # FROM:docker hubtan image alýr, base image, ilk satýr FROM ile baþlar > bu image içinde hem OS hem runtime var.
+WORKDIR /app  # image içerisinde dizin oluþturup projeyi bu dizine atalým -> image içinde bir App klasörü oluþacak  
+COPY bin/Release/net7.0/publish /app/ # COPY ile soldaki sourcetan saðdaki image.app dizinine publish edilen dosyalarý atacak
+ENTRYPOINT ["dotnet","Docker_Dockerize.ConsoleDocker.dll"] # imagedan container ayaða kalkarken çalýþacak olan komut/dosya
+
+#4 satýr = 4 layer ,image tarafýnda 4 layer oluþtu, bu imagedan bir container ayaða kalkýnca, docker bir tane de yazýlabilen layer eklicek toplamda 5 layer ile container ayaða kalkacak.
+
+
+
+################################################################################################################################################################
+
+######################################## ORJ ########################################
+##See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+#
+#FROM mcr.microsoft.com/dotnet/runtime:7.0 AS base
+#WORKDIR /app
+#
+#FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+#WORKDIR /src
+#COPY ["Docker_Dockerize.ConsoleDocker/Docker_Dockerize.ConsoleDocker.csproj", "Docker_Dockerize.ConsoleDocker/"]
+#RUN dotnet restore "Docker_Dockerize.ConsoleDocker/Docker_Dockerize.ConsoleDocker.csproj"
+#COPY . .
+#WORKDIR "/src/Docker_Dockerize.ConsoleDocker"
+#RUN dotnet build "Docker_Dockerize.ConsoleDocker.csproj" -c Release -o /app/build
+#
+#FROM build AS publish
+#RUN dotnet publish "Docker_Dockerize.ConsoleDocker.csproj" -c Release -o /app/publish /p:UseAppHost=false
+#
+#FROM base AS final
+#WORKDIR /app
+#COPY --from=publish /app/publish .
+#ENTRYPOINT ["dotnet", "Docker_Dockerize.ConsoleDocker.dll"]
