@@ -78,3 +78,35 @@ dab dockerize_aspcoremvc_container3
 5 - docker rm --force dab 218  >>>>> remove 2 containers force(stop and remove)
 dab
 218
+
+
+
+------------------------------------------------------------
+
+Docker MultiStage Build : 1 den fazla base imagedan image oluþturma
+
+
+# Docker her satýr için 1 layer oluþturur
+# Docker her layerý cache leyebilir, o layer içerði deðiþmezse cache den çalýþýr : hýz - performans
+# COPY . .  >>> best practice deðil onun yerine 1 layer daha ekleyerek performans artýþý yapýldý.
+# COPY *.csproj . > ile csproj app içine kopyalanýp direk restore edildi ki kodlarda deðiþiklik varsa onlar restore edilsin, sonra COPY . .  yapýldý ki statiklerde deðiþen biþey yoksa direk cacheten gelsin. Bu þekilde eðer kodlar deðiþ de static dosyalar mesela bi css dosya ekledi/deðiþtirildi - o zaman da copy csproj ve restore direk cacheten çalýþýr sadece COPY . . normal çalýþýr - ki performans demek
+
+
+FROM mcr.microsoft.com/dotnet/sdk:7.0  as build #SDK image
+WORKDIR /app
+COPY . .
+RUN dotnet restore
+RUN dotnet publish Docker_Dockerize.AspNetCoreMvc.csproj -c Release -o out
+
+# bu noktada sdk/app/out/publish klasörleri oluþtu, ancak sdk image aþýrý büyük ve çok yer kaplýyor container oluþturup kaldýrmak için aþýrý ve gerekisz aslýnda. Þuan Dockerfile içinde bulunduðumuz noktada sdk gerekli þekilde publish aldý bu dizine, aslýnda bu publishi alýp sadece runtime image ile yola devam etsek çok daha kullanýþlý ve ufak olur.
+
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 #Runtime image
+WORKDIR /app # image iine app dizini oluþtur
+COPY --from=build /app/out .  # yeni image/app dizinine build takma adlý imageý içindeki app/out dizinini al
+ENV ASPNETCORE_URLS="http://*:5043"
+ENTRYPOINT ["dotnet","Docker_Dockerize.AspNetCoreMvc.dll"]
+
+>>>> docker images
+v3 > 220MB >>>> multiStage ile ciddi oranda küçüldü image.. önceki 831di.. SDKdan direk image oluþturma! sdk ile .net cli komutlarýndan snr runtime ile oluþtur!
+v2 > 831MB
+v1 > 220M
