@@ -110,3 +110,32 @@ ENTRYPOINT ["dotnet","Docker_Dockerize.AspNetCoreMvc.dll"]
 v3 > 220MB >>>> multiStage ile ciddi oranda küçüldü image.. önceki 831di.. SDKdan direk image oluþturma! sdk ile .net cli komutlarýndan snr runtime ile oluþtur!
 v2 > 831MB
 v1 > 220M
+
+
+--------------------------
+.dockerignore 
+
+COPY . .  > ile herþeyi kopyalýyorduk ama aþaðýdaki klasörleri örneðin kopyalamaya gerek yok! o zaman taþýmak istemediklerimizi  belirtelim! Dockerfile ile ayný dizine uzantýsý yine olmayan .dockerignore dosyasý oluþturalým! Dockerfile altýna eklenir solutionda.
+
+
+bin 
+obj
+Notes 
+
+
+-->
+** ile baþlar : iç içe tüm klasörleri ara 
+**/bin/ >>>> : iç içe tüm klasörleri ara bin kalsrüne rastlarsan onu alma
+
+**/bin/
+**/obj/
+**/Dockerfile*    >>>> uzantýsý ne olursa olsun Dockerfile isimli olanlarý alma
+**/.dockerignore*
+
+->
+
+Dockerfile ile aþaðýdaki son satýrlarla zaten publish klasörünü aldýðýmýz için halihazýrda .dockerignore içinde belirttiklerimiz zaten gelmiyor ama baþka þekilllerde yazsaydýk .dockerignore ile bu þekilde boyut küçültüp container hýzlandýrabilirdik.
+
+FROM mcr.microsoft.com/dotnet/aspnet:7.0
+WORKDIR /app
+COPY --from=build /app/out . 
