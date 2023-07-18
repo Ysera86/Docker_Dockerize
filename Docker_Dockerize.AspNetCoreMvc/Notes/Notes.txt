@@ -4,5 +4,33 @@
 		. : Dockerfile path (it is where it runs so .)
 
 2 - docker images
-		dockerize_aspcoremvc	v1	3c6	about a minute ago	793MB
-3 - 
+		dockerize_aspcoremvc	v1	1f8	about a minute ago	220MB
+
+3 - docker run -d --name dockerize_aspcoremvc_container -p 5042:80 1f8
+		localde 5042 portumdan container içindeki 80 portuna eriþim, yoksa appe eriþemem
+		(varsayýlan olarak container içinde 80 portundan çalýþýyor -biz önceden port verip oluþturmadýðýmýz için)
+
+		docker run : docker create + docker start + docker attach
+		-d : detach > dontt attach  
+		--name : container name
+		-p : mylocalport:dockerinnerport
+		1f8 : first 3 chars of ImageId
+
+	2. bi container daha
+		docker run -d --name dockerize_aspcoremvc_container2 -p 5043:80 1f8
+		--> c25
+4 -  docker rm --force c25
+	== docker stop c25 / docker rm c25
+
+--------------------------------------------------------------------------------------------------------------------
+.Net CLI : https://learn.microsoft.com/en-US/dotnet/core/tools/  (.Net Core CLI eski)
+
+dotnet build
+
+dotnet run
+
+dotnet publish [path]
+
+etc
+
+Instead of giving published path I can tell to publish inside Dockerfile
