@@ -1,0 +1,8 @@
+1 - docker build -t dockerize_aspcoremvc:v1 .
+		dockerize_aspcoremvc : name
+		:v1 : tag
+		. : Dockerfile path (it is where it runs so .)
+
+2 - docker images
+		dockerize_aspcoremvc	v1	3c6	about a minute ago	793MB
+3 - 
