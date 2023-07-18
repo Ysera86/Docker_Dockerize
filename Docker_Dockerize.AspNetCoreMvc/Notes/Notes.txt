@@ -34,3 +34,47 @@ dotnet publish [path]
 etc
 
 Instead of giving published path I can tell to publish inside Dockerfile
+
+
+
+
+
+
+
+
+
+######################################### Dockerfile #########################################
+
+
+FROM mcr.microsoft.com/dotnet/sdk:7.0
+WORKDIR /app
+COPY . .  => COPY all files and folders where my Dockerfile is   to /app folder I mentioned above where base imge will create on the 1st row
+RUN dotnet restore => get all updates on lib/dependencies, or download if nuget pckgs not downloaded etc
+RUN dotnet publish Docker_Dockerize.AspNetCoreMvc.csproj -c Release -o out => take csproj all libs are mentioned there, and publish accordingly with mode Release and out them to a folder names out where you will create inside app folder
+WORKDIR out => go to out folder we will work there
+ENV ASPNETCORE_URLS="http://*:5043" => published local project will run on localhost, container will run it on also localhost, but in the outside world it won't be accessed, container will have to run it on IP, Environment  says it to tun on localhost:5000 (run exe from C:\Users\merve\source\repos\Docker_Dockerize\Docker_Dockerize.AspNetCoreMvc\bin\Release\net7.0\publish to see the env url which is localhost:5000), 
+so take whatever IP and run it on port 5043, https://andrewlock.net/5-ways-to-set-the-urls-for-an-aspnetcore-app/
+https://learn.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-7.0
+ENTRYPOINT ["dotnet","Docker_Dockerize.AspNetCoreMvc.dll"]
+
+
+--->>> 
+1 - docker build -t dockerize_aspcoremvc:v2 .
+2 - docker images
+		dockerize_aspcoremvc	v2	bf9	31 seconds ago	831MB
+3 - docker run -d --name dockerize_aspcoremvc_container2 -p 5042:5043 bf9
+		5042 : MyPort : launchsettings.  "applicationUrl": "https://localhost:7044;http://localhost:5042",
+		5053 : DockerPort : Dockerfile.  ENV ASPNETCORE_URLS="http://*:5043"
+to run this, I have stopped the prev container which is created from image 1f8 inorder to use 5042 port, since I wanted to run it in on localhost:5042
+
+
+2nd container
+docker run -d --name dockerize_aspcoremvc_container3 -p 5043:5043 bf9
+
+4 - docker ps
+dab dockerize_aspcoremvc_container3
+218 dockerize_aspcoremvc_container2
+
+5 - docker rm --force dab 218  >>>>> remove 2 containers force(stop and remove)
+dab
+218
