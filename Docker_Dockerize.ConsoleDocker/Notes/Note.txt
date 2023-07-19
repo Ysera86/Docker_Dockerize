@@ -58,7 +58,8 @@ docker pull : docker hub tan image çekme
 önce docker hubta bir repository oluþturulur. (setting kýsmýndan public -> private yapýlabilir.) > hubta dockerdeneme adýnda repo oluþturdum.(docker push merveugursac/dockerdeneme:tagname) login deðilsek olmalýyýz : 1 repo içine taglerle 1den çok image atabiliyorum
 
 
-
+14 - docker build --no-cache  -t dockerizeconsoleapp:v4 .
+--no-cache : tüm layerlarý oluþtururken cacheten almasýn hepsini sýfýrdan oluþtursun (bazen image oluþturup container ayaða kaldýrýnca deðiþiklik olmamýþ gibi görünüyorsa da bu iþe yarar)
 
 
 

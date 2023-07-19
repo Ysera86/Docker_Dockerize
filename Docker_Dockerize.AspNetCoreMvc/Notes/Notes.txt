@@ -169,3 +169,22 @@ Container kapatýnca/silinince bu layerlar gitti.
 		- uzak cloud ortamdaki volumelara da container datalarýný gönderebiliriz
 
 3 - Tmpfs Mount :  Containerlar tarafýndan üretilen datalar iþletim sistemi üzerinde deðil memoryde kaydedilir.
+
+----------------------------------------------------------------------------------
+-V Docker volume öncesi
+1- resim ekle/görüntüle sonrasý image oluþtur
+docker build --no-cache -t dockerize_aspcoremvc:v4 .   -> 39c....
+2 - image Id al
+docker images
+3 - image dan 1. container kaldýr
+docker run -d --name dockerize_aspcoremvc_container4 -p 5044:5044 39c   -> 818....
+4 - image dan 2. container kaldýr
+docker run -d --name dockerize_aspcoremvc_container4 -p 5045:5044 39c   -> fa8....
+sonuç : 
+- > containerler birbirinden baðýmsýz, birinden kaydettiðimiz resmi diðer containerda göremedik ve durdurunda kaydettiðimiz resimler gitti
+5 - 2 containerý da sil
+docker rm --force 818 fa8   -> 818   fa8
+6 - image dan 1 container kaldýr
+docker run -d --name dockerize_aspcoremvc_container4 -p 5044:5044 39c   -> 070....
+7 - localhost:5044 ile bakýnca önceden eklenmiþ resimlerin gelmedðini gördük. yani eski resimer o containerýn inmemorysindeydi .
+
