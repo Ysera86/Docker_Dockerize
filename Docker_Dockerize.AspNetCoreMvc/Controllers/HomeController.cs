@@ -1,5 +1,6 @@
 ﻿using Docker_Dockerize.AspNetCoreMvc.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 using System.Diagnostics;
 
 namespace Docker_Dockerize.AspNetCoreMvc.Controllers
@@ -7,10 +8,12 @@ namespace Docker_Dockerize.AspNetCoreMvc.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IFileProvider _fileProvider;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IFileProvider fileProvider)
         {
             _logger = logger;
+            _fileProvider = fileProvider;
         }
 
         public IActionResult Index()
@@ -41,6 +44,22 @@ namespace Docker_Dockerize.AspNetCoreMvc.Controllers
                 await imageFile.CopyToAsync(fs);
             }
             return View();
+        }  
+        public IActionResult ImageShow()
+        {
+            var images = _fileProvider.GetDirectoryContents("wwwroot/images").ToList().Select(x => x.Name);
+
+            return View(images);
+        }
+
+        [HttpPost]
+        public IActionResult ImageShow(string name)
+        {
+            var image = _fileProvider.GetDirectoryContents("wwwroot/images").ToList().First(x => x.Name == name);
+
+            System.IO.File.Delete(image.PhysicalPath);
+
+            return RedirectToAction("ImageShow");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

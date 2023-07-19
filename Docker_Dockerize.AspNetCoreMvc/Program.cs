@@ -1,7 +1,19 @@
+using Microsoft.Extensions.FileProviders;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+//..
+
+// Projemdeki dosya dizinlere eriþim saðlayan servis
+
+IFileProvider fileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory());
+builder.Services.AddSingleton<IFileProvider>(fileProvider); 
+
+//..
+
 
 var app = builder.Build();
 
