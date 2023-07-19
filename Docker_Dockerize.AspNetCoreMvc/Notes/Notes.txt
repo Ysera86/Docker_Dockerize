@@ -139,3 +139,33 @@ Dockerfile ile aþaðýdaki son satýrlarla zaten publish klasörünü aldýðýmýz için h
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
 COPY --from=build /app/out . 
+
+
+
+------------------------------------------------------------
+Docker Volume 
+
+Docker containerlar tarafýndan üretilen datalarý kalýcý kýlmamýzý saðlayan bir yöntem.
+
+
+Sorunlar:
+------------
+1 - Imagedan bir container ayaða kaldýrdýðýmýzda image layerlarýnýn en üstüne bir layer ekleniyor, bir data (örneðin bir resim) kaydettiðimiz zaman da bu data en üst layera kaydediliyor.
+Container kapatýnca/silinince bu layerlar gitti.
+
+2 - 2 ayrý container 2 ayrý bilgisayarda çalýþan uygulama gibidir. 2si de birbirlerinin kaydettiði datalrý göremez.
+
+Çözümler :
+------------
+1 - Bind Mount : OS üzerindeki bir dosyaya containerlar tarafýndan üretilen datalarýn kaydedilme iþlemi.
+	örn: windows üzerinde dockerým var, masaüstünde bir klasör oluþtururum ve dockerdaki tüm containerlarým bu dizine data kaydeder.
+	2 soruna da çözüm.
+2 - Volume :  Docker CLI tarafýndan yönetilen, OS üzerinde deðil, Docker'ýn kendi içerisinde bir alaný oluþturmasý (Docker area). Performaslý
+	örn: Docker CLI ile "resimler" diye bir volume oluþturuyoruz, docker içerisinde özel bir alan oluyor ve container datalarýný buraya kaydediyoruz.
+
+	Bind Mount vs Volume : 
+		- volume direk CLI ile yönetilebiliyor, içinde olduðu için yönetim tamamen Docker'a ait
+		- volumelarýn migrate, backup bindmounta göre çok daha kolay
+		- uzak cloud ortamdaki volumelara da container datalarýný gönderebiliriz
+
+3 - Tmpfs Mount :  Containerlar tarafýndan üretilen datalar iþletim sistemi üzerinde deðil memoryde kaydedilir.
