@@ -173,18 +173,54 @@ Container kapatınca/silinince bu layerlar gitti.
 ----------------------------------------------------------------------------------
 -V Docker volume öncesi
 1- resim ekle/görüntüle sonrası image oluştur
-docker build --no-cache -t dockerize_aspcoremvc:v4 .   -> 39c....
+docker build --no-cache -t dockerize_aspcoremvc:v1 .   -> d02....
 2 - image Id al
 docker images
 3 - image dan 1. container kaldır
-docker run -d --name dockerize_aspcoremvc_container4 -p 5044:5044 39c   -> 818....
+docker run -d --name dockerize_aspcoremvc_container1 -p 5044:5044 d02   -> 818....
 4 - image dan 2. container kaldır
-docker run -d --name dockerize_aspcoremvc_container4 -p 5045:5044 39c   -> fa8....
+docker run -d --name dockerize_aspcoremvc_container2 -p 5045:5044 d02   -> fa8....
 sonuç : 
 - > containerler birbirinden bağımsız, birinden kaydettiğimiz resmi diğer containerda göremedik ve durdurunda kaydettiğimiz resimler gitti
 5 - 2 containerı da sil
 docker rm --force 818 fa8   -> 818   fa8
 6 - image dan 1 container kaldır
-docker run -d --name dockerize_aspcoremvc_container4 -p 5044:5044 39c   -> 070....
-7 - localhost:5044 ile bakınca önceden eklenmiş resimlerin gelmedğini gördük. yani eski resimer o containerın inmemorysindeydi .
+docker run -d --name dockerize_aspcoremvc_container1 -p 5044:5044 d02   -> 070....
+7 - localhost:5044 ile bakınca önceden eklenmiş resimlerin gelmedğini gördük. yani eski resimer o containerın inmemorysindeydi . containerı sildim. 
 
+
+image Id : 691
+
+-> Docker Volume sonrası :  
+----------------------------
+1 - bind-mount
+
+1 - Docker > Settings > Resources > File Sharing > Share the drive you want to keep files from the containers : C:\
+-> C:\Users\merve\OneDrive\Belgeler\Docker Files klasörünü oluşturdum.
+2 - docker run -d --name dockerize_aspcoremvc_container1 -p 5044:5044 --mount type=bind,source="C:\Users\merve\OneDrive\Belgeler\docker-files",target="/app/wwwroot/images" 691 
+2 - docker run -d --name dockerize_aspcoremvc_container2 -p 5045:5044 --mount type=bind,source="C:\Users\merve\OneDrive\Masaüstü\docker-files",target="/app/wwwroot/images" 691 
+
+--> nedense bende hata veriyor : 
+docker: Error respose from daemon: invalid mount config for type"bind" : bind source path does not exist: /run/desktop/mnt/host/c/Users/merve/OneDrive/Belgeler/docker-files
+docker: Error respose from daemon: invalid mount config for type"bind" : bind source path does not exist: /run/desktop/mnt/host/c/Users/merve/OneDrive/Masaüstü/docker-files
+
+-->> olsaydı -bu 2 container ayağa kalksaydı - her 2 containerın appından da eklenen dosyalar belirttiğim dizine eklenir, ve bu 2 contaner da birbirinin eklediklerini görürlerdi.
+
+--> bu bind-mount volume tipinde container ayağa kalktığında direk olarak source="C:\Users\merve\OneDrive\Masaüstü\docker-files" klasörünü görüyordu ve öncesinde target="/app/wwwroot/images" klasörümde var olan dosyaları görmedi bile. 
+
+2 - volume : bind-mounta göre daha faydalı, backup, migrate yapılabilir, cloud üzerinde volumelara da kaydedebiliriz.
+
+1 - docker volume create images  -> images dediği an oluştu
+docker içinde bir volume oluştur
+
+-v = --volume :  --volume images:/app/wwwroot/images  = images adında bir volume oluştur ve image içindeki /app/wwwroot/images klasöründen başlangıç değerlerini al
+2 - docker run -d --name mycon1 -p 5044:5044 --volume images:/app/wwwroot/images 691 -> c7d.. containe rayağa kalktı
+docker run -d --name mycon2 -p 5045:5044 --volume images:/app/wwwroot/images 691 -> 992
+
+
+--> bu volume volume tipinde container ayağa kalktığında direk olarak önce eşleştirmiş olduğumuz klasör ile volume u eşitler, yani  /app/wwwroot/images klasöründe şuan varolan 3 resim dosyasını oluşturulan images volumeına atar.
+
+3 - docker rm 992 c7d --force
+volume silme denice containerları silelim öncesinde
+
+4 - docker volume rm images -> images dedi
