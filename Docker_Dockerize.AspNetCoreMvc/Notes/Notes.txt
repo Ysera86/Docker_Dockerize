@@ -257,3 +257,13 @@ Docker içinde otomatik olarak production olur, loglama yoksa hata aldýysak prodd
 docker run -d --name mycon -p 5044:5044 --env ASPNETCORE_ENVIRONMENT=DEVELOPMENT  785 -> 5d1     Ortam Development geldi.
 --->>>
 
+
+----------------------------------------------------------------------------------
+
+<none> image
+her zaman deðil ama bazen <none> image oluþuyor image oluþtururken, docker bunlarý önbellek -cacheleme- mekanizmasý oluþturmak için kullanýyor. Silmek mantýklý olan
+
+-f : filter,  "dangling=true" <none> image demek
+docker images -f "dangling=true"
+$(docker images -f "dangling=true" -q) > ImageIDler gelir
+docker rmi $(docker images -f "dangling=true" -q)
