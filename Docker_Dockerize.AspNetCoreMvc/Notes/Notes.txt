@@ -267,3 +267,33 @@ her zaman deðil ama bazen <none> image oluþuyor image oluþtururken, docker bunla
 docker images -f "dangling=true"
 $(docker images -f "dangling=true" -q) > ImageIDler gelir
 docker rmi $(docker images -f "dangling=true" -q)
+
+----------------------------------------------------------------------------------
+
+Container environment :  çok önemli kritik bilgiler appsettingste olmamalý env güvenli
+
+environmentlarý sadece ortam belirlemede deðil appsettings.json içindeki deðiþkenlerini ezmek için de kullanýyoruz
+
+örn:  appsettings.Development.json "MySqlCon": "Local db yolu", ekledik
+appsettings.Development.json kopyalayýp appsettings.Production.json oluþturduk ve içine  "MySqlCon": "Uzak sunucu db yolu",  ekledik
+
+-> app deploy edilince appsettings.Production.json da gidecek  ve app ftpsini ele geçirse birisi , bu dosyada da uzan sunucu baðlantý bilgileri kullanýcý adý þifresi vs olsa tam br güvenlik zafiyeti. aslýnda secretkey vs kullanmalýyýz öle olcaksa da, container için bu key-value larý burda tutmaktansa environment olarak belirtebilirz. 
+
+O zaman appsettings.Production.json içinden  "MySqlCon": "Uzak sunucu db yolu",  silmeliyiz. HomeControllerda appsettings okumak için IConfiguration DI ile alýp config içinden MySqlCon okuyup Index. ViewBag.MySqlCon içine alýp yazdýk: _configuration["MySqlCon"]; projenin her yerinde, varsayýlan olarak ÝLK ÖNCE MySqlCon isimli bir ortam deðiþkeni var mý bakar yoksa appsettinge bakar! (env apssettingi ezer). F5 ve Local db yolu yazdý
+
+--env = -e
+
+kod deðiþtiði için yeni image alýp ordan container ile devam etmek gerekli.
+docker build -t dockerize_aspcoremvc:v3 .   
+docker images -> fe6
+docker run -d --name mycon -p 5044:5044 --env MySqlCon='Uzak sunucu db yolu'  fe6 -> 9d3   
+	-> çalýþtýrýnca :  Uzak sunucu db yolu     Ortam Production
+docker run -d --name myconDev -p 5045:5044 --env ASPNETCORE_ENVIRONMENT=DEVELOPMENT  fe6 -> 03c     
+	-> çalýþtýrýnca :  Ortam Development
+docker run -d --name myconDevEnv -p 5046:5044 -e ASPNETCORE_ENVIRONMENT=DEVELOPMENT -e MySqlCon='Uzak sunucu db yolu' fe6 -> a63
+	-> çalýþtýrýnca :  Uzak sunucu db yolu     Ortam Development
+
+2. yol Dockerfile
+ENV ASPNETCORE_URLS="http://*:5044" -> bu hali hazýrda var zaten
+ENV MySqlCon="Uzak sunucu db yolu"
+ENV ASPNETCORE_ENVIRONMENT="DEVELOPMENT"
