@@ -224,3 +224,36 @@ docker run -d --name mycon2 -p 5045:5044 --volume images:/app/wwwroot/images 691
 volume silme denice containerlarý silelim öncesinde
 
 4 - docker volume rm images -> images dedi
+
+----------------------------------------------------------------------------------
+
+Environment
+
+Asp.net core tarafýnda bir uygulama oluþturunca default olarak 3 environment gelir. Ýstediðimiz kadar ortam oluþturabiliriz. 
+Production, Development, Staging
+
+Herhangi bir env belirtilmezse Production env ile, localhostta ise Development ortamýnda ayaða kalkar.
+
+VSde > project > proerties > environment yazýp aratýnca bu projenin VSde hangi ortamda çalýþtýðýmý görebiliriz. Ýstediðimiz eklenebilir. key-value
+ASPNETCORE_ENVIRONMENT=Development
+
+--->>>
+Viewda environment tagý var, hangi ortamda çalýþýyorsak onun içindeki kodlar çalýþsýn diye. Ortam Development geldi þuan.
+<environment names="Development">
+    <h1>Ortam Development</h1>
+</environment>
+<environment names="Production">
+    <h1>Ortam Production</h1>
+</environment>
+
+Publish edip içinden çalýþtýrýnca da Ortam Production geldi þuan.
+
+docker run -d --name mycon -p 5044:5044 785 -> b0e
+containerdan çalýþtýrýnca localhost:5044ten, Ortam Production geldi
+docker rm b0e --force -> b0e
+
+Docker içinde otomatik olarak production olur, loglama yoksa hata aldýysak prodda anlaþýlmýyor developmentta görebiliriz, gerekirse development olmasý için :
+
+docker run -d --name mycon -p 5044:5044 --env ASPNETCORE_ENVIRONMENT=DEVELOPMENT  785 -> 5d1     Ortam Development geldi.
+--->>>
+
