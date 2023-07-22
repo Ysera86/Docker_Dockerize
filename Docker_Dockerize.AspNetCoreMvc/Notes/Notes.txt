@@ -297,3 +297,35 @@ docker run -d --name myconDevEnv -p 5046:5044 -e ASPNETCORE_ENVIRONMENT=DEVELOPM
 ENV ASPNETCORE_URLS="http://*:5044" -> bu hali hazýrda var zaten
 ENV MySqlCon="Uzak sunucu db yolu"
 ENV ASPNETCORE_ENVIRONMENT="DEVELOPMENT"
+
+
+----> Çok katmanlý asp core mvc projesi dockerize :  NLayer appten devam bu kýsým
+
+
+
+Dokcer kurunca : Docker CLI ve Docker Compose CLI gelir.
+
+Docker Compose 
+---------------------------------------------
+Micro servis mimarisinde yoðun þekilde kullanýlýyor.
+Docker Compose bir tool
+YAML formatý :  JSONDan daha sade, {, }yok, girintilerle belirleniyor neyin ne altýnda olduðu.
+Settings.json dosyalarý yaml formatýna geçebilir ileride. 
+
+Birden fazla image, birden fazla containerý yönetmeyi saðlar.
+Miroservis dünyasýnda tek bir komutla birden fazla mikro servisi kaldýrmak/ durdurmak/silmek için.
+
+Docker compose development amacýyla kullanýlmalý, prod için kubernetes, swarm gibi sistemler kullanmak uygun bir yaklaþýmdýr.
+
+docker version -> 
+
+Docker'ýn 2 versiyonu var:
+docker compose version -> v2.19.1  > bu yenisi  -> docker compose
+docker-compose-v1.exe version  -> 1.29.2 > bu eskisi   -> docker-compose
+
+docker compose push 
+docker compose pull
+docker compose up 
+docker compose down
+start
+stop
